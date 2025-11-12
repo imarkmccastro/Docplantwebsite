@@ -1,20 +1,31 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card } from '../ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Camera, MapPin, Mail, User, Edit2, Save } from 'lucide-react';
+import { Camera, MapPin, Mail, User, Edit2, Save, Settings, LogOut, Package } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { useUser } from '../UserContext';
+import { toast } from 'sonner@2.0.3';
 
 export function Profile() {
+  const navigate = useNavigate();
+  const { currentUser, logout } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
-    location: 'San Francisco, CA',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    name: currentUser?.name || 'Guest User',
+    email: currentUser?.email || 'guest@email.com',
+    location: 'Philippines',
+    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.name || 'Guest'}`,
   });
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
 
   const [preferences] = useState([
     'Succulents',
@@ -172,6 +183,37 @@ export function Profile() {
               <div className="text-green-600 mb-1">342</div>
               <p className="text-sm text-gray-600">Likes</p>
             </div>
+          </div>
+        </Card>
+
+        {/* Quick Actions Card */}
+        <Card className="p-6 shadow-md mt-4">
+          <h2 className="mb-4">Quick Actions</h2>
+          <div className="space-y-3">
+            <Button
+              onClick={() => navigate('/orders')}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <Package className="w-4 h-4 mr-3" />
+              Track My Orders
+            </Button>
+            <Button
+              onClick={() => navigate('/admin')}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <Settings className="w-4 h-4 mr-3" />
+              Admin Dashboard
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4 mr-3" />
+              Log Out
+            </Button>
           </div>
         </Card>
       </div>

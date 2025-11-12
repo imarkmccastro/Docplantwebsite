@@ -4,9 +4,12 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Leaf } from 'lucide-react';
+import { useUser } from '../UserContext';
+import { toast } from 'sonner@2.0.3';
 
 export function Login() {
   const navigate = useNavigate();
+  const { login } = useUser();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,13 +17,24 @@ export function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - in production, this would connect to a backend
-    navigate('/home');
+    
+    const success = login(formData.email, formData.password);
+    
+    if (success) {
+      toast.success('Login successful!');
+      navigate('/home');
+    } else {
+      toast.error('Invalid email or password');
+    }
   };
 
   const handleSocialLogin = () => {
-    // Mock social login - in production, this would connect to OAuth provider
-    navigate('/home');
+    // Mock social login - auto login as demo user
+    const success = login('admin@docplant.com', 'admin123');
+    if (success) {
+      toast.success('Login successful!');
+      navigate('/home');
+    }
   };
 
   return (
