@@ -5,9 +5,12 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { Leaf } from 'lucide-react';
+import { useUser } from '../UserContext';
+import { toast } from 'sonner@2.0.3';
 
 export function SignUp() {
   const navigate = useNavigate();
+  const { signup, login } = useUser();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,15 +20,29 @@ export function SignUp() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock signup - in production, this would connect to a backend
-    if (formData.password === formData.confirmPassword) {
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    const success = signup(formData.email, formData.password, formData.name);
+    
+    if (success) {
+      toast.success('Account created successfully!');
       navigate('/home');
+    } else {
+      toast.error('Email already exists');
     }
   };
 
   const handleSocialLogin = () => {
-    // Mock social login - in production, this would connect to OAuth provider
-    navigate('/home');
+    // Mock social login - auto login as demo user
+    const success = login('admin@docplant.com', 'admin123');
+    if (success) {
+      toast.success('Login successful!');
+      navigate('/home');
+    }
   };
 
   return (

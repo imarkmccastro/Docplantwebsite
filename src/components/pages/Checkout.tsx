@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -7,10 +8,29 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { ArrowLeft, Trash2, CreditCard, Truck, ShoppingBag } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { useCart } from '../CartContext';
+import { useOrders } from '../OrderContext';
+import { useUser } from '../UserContext';
+import { toast } from 'sonner@2.0.3';
 
 export function Checkout() {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { addOrder } = useOrders();
+  const { currentUser } = useUser();
+
+  const [shippingInfo, setShippingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    zipCode: '',
+  });
+
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardNumber: '',
+    expiry: '',
+    cvv: '',
+  });
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = 449;
@@ -18,9 +38,36 @@ export function Checkout() {
   const total = subtotal + shipping + tax;
 
   const handleCheckout = () => {
-    alert('Order placed successfully!');
+    if (!currentUser) {
+      toast.error('Please log in to place an order');
+      navigate('/login');
+      return;
+    }
+
+    if (!shippingInfo.firstName || !shippingInfo.lastName || !shippingInfo.address || !shippingInfo.city) {
+      toast.error('Please fill in all shipping information');
+      return;
+    }
+
+    if (!paymentInfo.cardNumber || !paymentInfo.expiry || !paymentInfo.cvv) {
+      toast.error('Please fill in payment information');
+      return;
+    }
+
+    const trackingNumber = addOrder({
+      userId: currentUser.id,
+      userEmail: currentUser.email,
+      userName: currentUser.name,
+      items: cartItems,
+      total,
+      status: 'Processing',
+      deliveryAddress: `${shippingInfo.address}, ${shippingInfo.city} ${shippingInfo.zipCode}`,
+      paymentMethod: `Card ending in ${paymentInfo.cardNumber.slice(-4)}`,
+    });
+
+    toast.success(`Order placed successfully! Tracking: ${trackingNumber}`);
     clearCart();
-    navigate('/home');
+    navigate('/orders');
   };
 
   return (
@@ -120,27 +167,57 @@ export function Checkout() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" placeholder="John" className="mt-1" />
+                    <Input 
+                      id="firstName" 
+                      placeholder="John" 
+                      className="mt-1" 
+                      value={shippingInfo.firstName}
+                      onChange={(e) => setShippingInfo({ ...shippingInfo, firstName: e.target.value })}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" placeholder="Doe" className="mt-1" />
+                    <Input 
+                      id="lastName" 
+                      placeholder="Doe" 
+                      className="mt-1" 
+                      value={shippingInfo.lastName}
+                      onChange={(e) => setShippingInfo({ ...shippingInfo, lastName: e.target.value })}
+                    />
                   </div>
                 </div>
                 
                 <div>
                   <Label htmlFor="address">Address</Label>
-                  <Input id="address" placeholder="123 Main St" className="mt-1" />
+                  <Input 
+                    id="address" 
+                    placeholder="123 Main St" 
+                    className="mt-1" 
+                    value={shippingInfo.address}
+                    onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
+                  />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="city">City</Label>
-                    <Input id="city" placeholder="San Francisco" className="mt-1" />
+                    <Input 
+                      id="city" 
+                      placeholder="Manila" 
+                      className="mt-1" 
+                      value={shippingInfo.city}
+                      onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="zipCode">Zip Code</Label>
-                    <Input id="zipCode" placeholder="94102" className="mt-1" />
+                    <Input 
+                      id="zipCode" 
+                      placeholder="1000" 
+                      className="mt-1" 
+                      value={shippingInfo.zipCode}
+                      onChange={(e) => setShippingInfo({ ...shippingInfo, zipCode: e.target.value })}
+                    />
                   </div>
                 </div>
               </div>
@@ -192,17 +269,35 @@ export function Checkout() {
                 
                 <div>
                   <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input id="cardNumber" placeholder="1234 5678 9012 3456" className="mt-1" />
+                  <Input 
+                    id="cardNumber" 
+                    placeholder="1234 5678 9012 3456" 
+                    className="mt-1" 
+                    value={paymentInfo.cardNumber}
+                    onChange={(e) => setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })}
+                  />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div>
                     <Label htmlFor="expiry">Expiry</Label>
-                    <Input id="expiry" placeholder="MM/YY" className="mt-1" />
+                    <Input 
+                      id="expiry" 
+                      placeholder="MM/YY" 
+                      className="mt-1" 
+                      value={paymentInfo.expiry}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, expiry: e.target.value })}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="cvv">CVV</Label>
-                    <Input id="cvv" placeholder="123" className="mt-1" />
+                    <Input 
+                      id="cvv" 
+                      placeholder="123" 
+                      className="mt-1" 
+                      value={paymentInfo.cvv}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, cvv: e.target.value })}
+                    />
                   </div>
                 </div>
               </div>
