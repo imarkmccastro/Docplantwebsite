@@ -19,7 +19,7 @@ export function Navigation() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 backdrop-blur-xl bg-white/60 border-t-2 border-white/40 z-50 shadow-lg shadow-emerald-100/20">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {
@@ -30,8 +30,10 @@ export function Navigation() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'text-green-600' : 'text-gray-500 hover:text-green-600'
+                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 ${
+                  isActive 
+                    ? 'text-emerald-600 bg-emerald-50/80 shadow-sm' 
+                    : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50/40'
                 }`}
               >
                 <Icon className="w-5 h-5" />

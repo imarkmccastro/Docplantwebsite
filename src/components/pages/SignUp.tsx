@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { Leaf } from 'lucide-react';
+import { Leaf, User, Mail, Lock, Sparkles } from 'lucide-react';
 import { useUser } from '../UserContext';
 import { toast } from 'sonner@2.0.3';
+import { motion } from 'motion/react';
+import { EcoBackground } from '../EcoBackground';
+import { GlassCard } from '../GlassCard';
 
 export function SignUp() {
   const navigate = useNavigate();
@@ -17,6 +19,7 @@ export function SignUp() {
     password: '',
     confirmPassword: '',
   });
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +32,7 @@ export function SignUp() {
     const success = signup(formData.email, formData.password, formData.name);
     
     if (success) {
-      toast.success('Account created successfully!');
+      toast.success('Welcome to Doc Plant! 🌱');
       navigate('/home');
     } else {
       toast.error('Email already exists');
@@ -37,133 +40,285 @@ export function SignUp() {
   };
 
   const handleSocialLogin = () => {
-    // Mock social login - auto login as demo user
     const success = login('admin@docplant.com', 'admin123');
     if (success) {
-      toast.success('Login successful!');
+      toast.success('Welcome to Doc Plant! 🌱');
       navigate('/home');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          {/* Logo and Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                <Leaf className="w-10 h-10 text-green-600" />
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+      <EcoBackground />
+
+      {/* Main Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <GlassCard>
+          <div className="p-8">
+            {/* Logo and Header */}
+            <div className="text-center mb-6">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="flex justify-center mb-4"
+              >
+                <div className="relative">
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-400 rounded-full blur-2xl opacity-40"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.4, 0.6, 0.4],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                  <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-400/30 to-green-400/30 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/50 shadow-lg">
+                    <Leaf className="w-10 h-10 text-emerald-600" />
+                    <Sparkles className="w-3 h-3 text-green-500 absolute top-1 right-1" />
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.h1
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent mb-2"
+              >
+                Join Doc Plant
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-gray-600"
+              >
+                Start your journey to greener living
+              </motion.p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name Field */}
+              <div>
+                <Label htmlFor="name" className="text-gray-700 mb-2 block">
+                  Full Name
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                    <User className={`w-5 h-5 transition-all duration-300 ${
+                      focusedField === 'name' ? 'text-emerald-500' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onFocus={() => setFocusedField('name')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    className={`pl-12 bg-white/50 border-2 transition-all duration-300 rounded-2xl h-12 ${
+                      focusedField === 'name'
+                        ? 'border-emerald-400 shadow-lg shadow-emerald-100'
+                        : 'border-white/60'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Email Field */}
+              <div>
+                <Label htmlFor="email" className="text-gray-700 mb-2 block">
+                  Email Address
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                    <Mail className={`w-5 h-5 transition-all duration-300 ${
+                      focusedField === 'email' ? 'text-emerald-500' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    className={`pl-12 bg-white/50 border-2 transition-all duration-300 rounded-2xl h-12 ${
+                      focusedField === 'email'
+                        ? 'border-emerald-400 shadow-lg shadow-emerald-100'
+                        : 'border-white/60'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <Label htmlFor="password" className="text-gray-700 mb-2 block">
+                  Password
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                    <Lock className={`w-5 h-5 transition-all duration-300 ${
+                      focusedField === 'password' ? 'text-emerald-500' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    className={`pl-12 bg-white/50 border-2 transition-all duration-300 rounded-2xl h-12 ${
+                      focusedField === 'password'
+                        ? 'border-emerald-400 shadow-lg shadow-emerald-100'
+                        : 'border-white/60'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <Label htmlFor="confirmPassword" className="text-gray-700 mb-2 block">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                    <Lock className={`w-5 h-5 transition-all duration-300 ${
+                      focusedField === 'confirmPassword' ? 'text-emerald-500' : 'text-gray-400'
+                    }`} />
+                  </div>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    onFocus={() => setFocusedField('confirmPassword')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    className={`pl-12 bg-white/50 border-2 transition-all duration-300 rounded-2xl h-12 ${
+                      focusedField === 'confirmPassword'
+                        ? 'border-emerald-400 shadow-lg shadow-emerald-100'
+                        : 'border-white/60'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Natural Glow Button */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="pt-2"
+              >
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white border-0 rounded-2xl h-12 shadow-lg shadow-emerald-200/50 hover:shadow-xl hover:shadow-emerald-300/50 transition-all duration-300"
+                >
+                  Create Account
+                </Button>
+              </motion.div>
+            </form>
+
+            {/* Divider */}
+            <div className="mt-6 mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white/70 text-gray-500 rounded-full">
+                    Or continue with
+                  </span>
+                </div>
               </div>
             </div>
-            <h1 className="text-green-700 mb-2">Doc Plant</h1>
-            <p className="text-gray-600">Create your account to get started</p>
+
+            {/* Social Login Buttons */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={handleSocialLogin}
+                  className="w-full bg-white/60 border-2 border-white/60 hover:bg-white/80 hover:border-emerald-200 transition-all duration-300 rounded-2xl h-12"
+                >
+                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Google
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={handleSocialLogin}
+                  className="w-full bg-white/60 border-2 border-white/60 hover:bg-white/80 hover:border-emerald-200 transition-all duration-300 rounded-2xl h-12"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  Apple
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* Login Link */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-center text-gray-600"
+            >
+              Already have an account?{' '}
+              <Link 
+                to="/login" 
+                className="text-emerald-600 hover:text-green-600 transition-all duration-300 font-medium"
+              >
+                Log in
+              </Link>
+            </motion.p>
           </div>
+        </GlassCard>
 
-          {/* Plant Illustration */}
-          <div className="mb-6 rounded-xl overflow-hidden h-40">
-            <ImageWithFallback
-              src="https://images.unsplash.com/photo-1615420733059-0d97cf9ed9e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmVlbiUyMHBsYW50cyUyMGluZG9vcnxlbnwxfHx8fDE3NjI2NTg1MzR8MA&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Plants"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Enter your name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-              Sign Up
-            </Button>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <Button variant="outline" type="button" onClick={handleSocialLogin}>
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Google
-              </Button>
-              <Button variant="outline" type="button" onClick={handleSocialLogin}>
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                </svg>
-                Apple
-              </Button>
-            </div>
-          </div>
-
-          <p className="mt-6 text-center text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="text-green-600 hover:text-green-700">
-              Log in
-            </Link>
-          </p>
-        </div>
-      </div>
+        {/* Decorative leaf accents */}
+        <motion.div
+          className="absolute -top-8 -left-8 text-emerald-400/20"
+          animate={{ rotate: [0, 10, 0], y: [0, -5, 0] }}
+          transition={{ duration: 4, repeat: Infinity }}
+        >
+          <Leaf className="w-16 h-16" />
+        </motion.div>
+        <motion.div
+          className="absolute -bottom-8 -right-8 text-green-400/20"
+          animate={{ rotate: [0, -10, 0], y: [0, 5, 0] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        >
+          <Leaf className="w-20 h-20" />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

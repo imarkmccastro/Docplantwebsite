@@ -7,6 +7,7 @@ import { OrderProvider } from './components/OrderContext';
 import { Toaster } from './components/ui/sonner';
 import { SignUp } from './components/pages/SignUp';
 import { Login } from './components/pages/Login';
+import { ForgotPassword } from './components/pages/ForgotPassword';
 import { Home } from './components/pages/Home';
 import { Profile } from './components/pages/Profile';
 import { PlantScan } from './components/pages/PlantScan';
@@ -17,6 +18,7 @@ import { Reminders } from './components/pages/Reminders';
 import { CommunityForum } from './components/pages/CommunityForum';
 import { Admin } from './components/pages/Admin';
 import { OrderTracking } from './components/pages/OrderTracking';
+import { PlantDetails } from './components/pages/PlantDetails';
 
 export default function App() {
   return (
@@ -31,6 +33,7 @@ export default function App() {
                   <Route path="/preview_page.html" element={<Navigate to="/login" replace />} />
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/home" element={<Home />} />
                   <Route path="/scan" element={<PlantScan />} />
                   <Route path="/diagnosis" element={<DiagnosisResult />} />
@@ -41,6 +44,7 @@ export default function App() {
                   <Route path="/community" element={<CommunityForum />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/admin" element={<Admin />} />
+                  <Route path="/plant/:id" element={<PlantDetails />} />
                   <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
                 <Navigation />
