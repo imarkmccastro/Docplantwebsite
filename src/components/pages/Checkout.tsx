@@ -10,7 +10,7 @@ import { Separator } from '../ui/separator';
 import { useCart } from '../CartContext';
 import { useOrders } from '../OrderContext';
 import { useUser } from '../UserContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { EcoBackground } from '../EcoBackground';
 import { motion } from 'framer-motion';
 

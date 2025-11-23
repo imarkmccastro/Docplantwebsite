@@ -10,7 +10,7 @@ import { ArrowLeft, Edit, Trash2, Plus, Save, X, Users, Package, TrendingUp } fr
 import { useProducts } from '../ProductContext';
 import { useUser } from '../UserContext';
 import { useOrders } from '../OrderContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -241,7 +241,7 @@ export function Admin() {
                     <Label htmlFor="new-category">Category</Label>
                     <Select
                       value={newProductForm.category}
-                      onValueChange={(value) => setNewProductForm({ ...newProductForm, category: value })}
+                      onValueChange={(value: string) => setNewProductForm({ ...newProductForm, category: value })}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue />
@@ -415,7 +415,7 @@ export function Admin() {
                             <Label htmlFor={`edit-category-${product.id}`}>Category</Label>
                             <Select
                               value={editForm.category}
-                              onValueChange={(value) => setEditForm({ ...editForm, category: value })}
+                              onValueChange={(value: string) => setEditForm({ ...editForm, category: value })}
                             >
                               <SelectTrigger className="mt-1">
                                 <SelectValue />

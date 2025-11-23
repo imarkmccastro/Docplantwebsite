@@ -8,7 +8,7 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { Badge } from '../ui/badge';
 import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { EcoBackground } from '../EcoBackground';
 import { motion } from 'framer-motion';
 

@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Camera, MapPin, Mail, User, Edit2, Save, Settings, LogOut, Package, Sparkles } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { useUser } from '../UserContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { EcoBackground } from '../EcoBackground';
 import { motion } from 'framer-motion';
 

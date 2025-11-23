@@ -8,7 +8,7 @@ import { ArrowLeft, Star, ShoppingCart, Droplets, Sun, Wind, Ruler, Heart, Share
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useProducts } from '../ProductContext';
 import { useCart } from '../CartContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { EcoBackground } from '../EcoBackground';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';

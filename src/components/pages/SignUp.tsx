@@ -5,7 +5,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Leaf, User, Mail, Lock, Sparkles } from 'lucide-react';
 import { useUser } from '../UserContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { EcoBackground } from '../EcoBackground';
 import { GlassCard } from '../GlassCard';
