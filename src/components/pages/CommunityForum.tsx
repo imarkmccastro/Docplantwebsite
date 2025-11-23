@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Badge } from '../ui/badge';
 import { Textarea } from '../ui/textarea';
 import { Separator } from '../ui/separator';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { EcoBackground } from '../EcoBackground';
 

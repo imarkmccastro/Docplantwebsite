@@ -5,7 +5,7 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { Droplets, Sun, Sprout, AlertTriangle, ArrowLeft, Share2, Sparkles } from 'lucide-react';
 import { Progress } from '../ui/progress';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function DiagnosisResult() {
   const navigate = useNavigate();

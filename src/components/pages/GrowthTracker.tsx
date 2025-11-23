@@ -8,7 +8,7 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function GrowthTracker() {
   const [plants, setPlants] = useState([

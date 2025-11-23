@@ -9,7 +9,7 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function Reminders() {
   const [reminders, setReminders] = useState([

@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Leaf, Sprout } from 'lucide-react';
 
 export function EcoBackground() {

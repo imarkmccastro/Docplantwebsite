@@ -6,7 +6,7 @@ import { Label } from '../ui/label';
 import { Leaf, Mail, Lock, Sparkles } from 'lucide-react';
 import { useUser } from '../UserContext';
 import { toast } from 'sonner@2.0.3';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { EcoBackground } from '../EcoBackground';
 import { GlassCard } from '../GlassCard';
 

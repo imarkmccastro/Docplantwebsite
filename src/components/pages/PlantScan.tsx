@@ -5,7 +5,7 @@ import { Card } from '../ui/card';
 import { Scan, Camera, Upload, AlertCircle, CheckCircle, Clock, Sparkles } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function PlantScan() {
   const navigate = useNavigate();

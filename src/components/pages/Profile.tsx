@@ -10,7 +10,7 @@ import { Badge } from '../ui/badge';
 import { useUser } from '../UserContext';
 import { toast } from 'sonner@2.0.3';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function Profile() {
   const navigate = useNavigate();

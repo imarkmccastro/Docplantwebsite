@@ -5,7 +5,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Leaf, Mail, ArrowLeft, CheckCircle2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { EcoBackground } from '../EcoBackground';
 import { GlassCard } from '../GlassCard';
 

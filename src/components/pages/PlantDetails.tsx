@@ -10,7 +10,7 @@ import { useProducts } from '../ProductContext';
 import { useCart } from '../CartContext';
 import { toast } from 'sonner@2.0.3';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 

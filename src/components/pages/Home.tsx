@@ -10,7 +10,7 @@ import { useCart } from '../CartContext';
 import { useProducts } from '../ProductContext';
 import { toast } from 'sonner@2.0.3';
 import { EcoBackground } from '../EcoBackground';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function Home() {
   const navigate = useNavigate();
