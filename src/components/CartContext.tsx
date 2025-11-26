@@ -1,7 +1,11 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { toast } from 'sonner';
+import { fetchJson } from '../lib/api';
+import { useUser } from './UserContext';
 
 export interface CartItem {
-  id: number;
+  id: number; // cart item id
+  productId: number; // underlying product id
   name: string;
   seller: string;
   price: number;
@@ -12,69 +16,109 @@ export interface CartItem {
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, change: number) => void;
-  clearCart: () => void;
+  addToCart: (productId: number) => Promise<void>;
+  removeFromCart: (cartItemId: number) => Promise<void>;
+  updateQuantity: (cartItemId: number, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   cartCount: number;
+  refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    // Load cart from localStorage on initial render
-    if (typeof window !== 'undefined') {
-      try {
-        const savedCart = localStorage.getItem('docplant_cart');
-        return savedCart ? JSON.parse(savedCart) : [];
-      } catch (error) {
-        console.error('Failed to load cart from localStorage:', error);
-        return [];
-      }
-    }
-    return [];
-  });
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { currentUser, token } = useUser();
 
-  // Save cart to localStorage whenever it changes
+  const refreshCart = async () => {
+    if (!currentUser) {
+      setCartItems([]);
+      return;
+    }
+    try {
+      const data = await fetchJson<any[]>('/cart', { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      console.log('[Cart] Fetched items', data);
+      setCartItems(
+        data.map(ci => ({
+          id: ci.id,
+          productId: ci.productId ?? ci.product_id ?? 0,
+          name: ci.name,
+          seller: ci.seller,
+          price: ci.price,
+          quantity: ci.quantity,
+          image: ci.image,
+          category: ci.category,
+        }))
+      );
+    } catch (err) {
+      console.warn('[Cart] Failed to fetch cart', err);
+      setCartItems([]);
+    }
+  };
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('docplant_cart', JSON.stringify(cartItems));
-      } catch (error) {
-        console.error('Failed to save cart to localStorage:', error);
-      }
+    refreshCart();
+  }, [currentUser, token]);
+
+  const addToCart = async (productId: number) => {
+    if (!currentUser) {
+      toast.error('Please log in to add items to your cart');
+      return;
     }
-  }, [cartItems]);
-
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(i => i.id === item.id);
-      if (existingItem) {
-        return prevItems.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prevItems, { ...item, quantity: 1 }];
-    });
+    if (!token) {
+      toast.error('Authentication token missing. Try logging in again.');
+      return;
+    }
+    try {
+      await fetchJson('/cart', { method: 'POST', body: JSON.stringify({ productId }), headers: { Authorization: `Bearer ${token}` } });
+      await refreshCart();
+    } catch (err: any) {
+      console.error('[Cart] addToCart failed', err);
+      const msg = err?.message ? String(err.message) : 'server error';
+      toast.error(`Could not add item (${msg}).`);
+    }
   };
 
-  const removeFromCart = (id: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+  const removeFromCart = async (cartItemId: number) => {
+    if (!currentUser || !token) {
+      toast.error('Log in to modify your cart');
+      return;
+    }
+    try {
+      await fetchJson(`/cart/${cartItemId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      await refreshCart();
+    } catch (err: any) {
+      console.error('[Cart] removeFromCart failed', err);
+      toast.error('Failed to remove item.');
+    }
   };
 
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+  const updateQuantity = async (cartItemId: number, quantity: number) => {
+    if (!currentUser || !token) {
+      toast.error('Log in to update quantities');
+      return;
+    }
+    try {
+      await fetchJson(`/cart/${cartItemId}`, { method: 'PATCH', body: JSON.stringify({ quantity }), headers: { Authorization: `Bearer ${token}` } });
+      await refreshCart();
+    } catch (err: any) {
+      console.error('[Cart] updateQuantity failed', err);
+      toast.error('Failed to update quantity.');
+    }
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  const clearCart = async () => {
+    if (!currentUser || !token) {
+      toast.error('Log in to clear your cart');
+      return;
+    }
+    try {
+      await Promise.all(cartItems.map(ci => fetchJson(`/cart/${ci.id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }).catch(() => null)));
+      await refreshCart();
+    } catch (err: any) {
+      console.error('[Cart] clearCart failed', err);
+      toast.error('Failed to clear cart.');
+    }
   };
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -88,6 +132,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         clearCart,
         cartCount,
+        refreshCart,
       }}
     >
       {children}

@@ -267,16 +267,6 @@ export function Profile() {
                 </motion.div>
                 <motion.div whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
                   <Button
-                    onClick={() => navigate('/admin')}
-                    variant="outline"
-                    className="w-full justify-start bg-white/50 border-2 border-white/60 hover:bg-white/80 hover:border-emerald-200 rounded-2xl"
-                  >
-                    <Settings className="w-4 h-4 mr-3 text-emerald-600" />
-                    Admin Dashboard
-                  </Button>
-                </motion.div>
-                <motion.div whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
-                  <Button
                     onClick={handleLogout}
                     variant="outline"
                     className="w-full justify-start bg-white/50 border-2 border-white/60 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-2xl"

@@ -221,16 +221,9 @@ export function Home() {
                           <Button
                             size="sm"
                             className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white border-0 rounded-xl shadow-md min-h-[44px] px-4"
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              addToCart({
-                                id: plant.id,
-                                name: plant.name,
-                                seller: plant.seller,
-                                price: plant.price,
-                                image: plant.image,
-                                category: plant.category,
-                              });
+                              await addToCart(plant.id);
                               toast.success(`${plant.name} added to cart! 🌿`);
                             }}
                           >

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { fetchJson } from '../lib/api';
 
 export interface Product {
   id: number;
@@ -12,9 +13,9 @@ export interface Product {
 
 interface ProductContextType {
   products: Product[];
-  addProduct: (product: Omit<Product, 'id'>) => void;
-  updateProduct: (id: number, updates: Partial<Product>) => void;
-  deleteProduct: (id: number) => void;
+  addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
+  updateProduct: (id: number, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: number) => Promise<void>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -347,21 +348,39 @@ const initialProducts: Product[] = [
 ];
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const addProduct = (product: Omit<Product, 'id'>) => {
-    const newId = Math.max(...products.map(p => p.id), 0) + 1;
-    setProducts([...products, { ...product, id: newId }]);
+  // Load products from API on mount; fallback to initialProducts if API fails
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchJson<Product[]>('/products');
+        setProducts(data);
+      } catch {
+        setProducts(initialProducts);
+      }
+    })();
+  }, []);
+
+  const addProduct = async (product: Omit<Product, 'id'>) => {
+    const created = await fetchJson<Product>('/products', {
+      method: 'POST',
+      body: JSON.stringify(product),
+    });
+    setProducts(prev => [...prev, created]);
   };
 
-  const updateProduct = (id: number, updates: Partial<Product>) => {
-    setProducts(products.map(p => 
-      p.id === id ? { ...p, ...updates } : p
-    ));
+  const updateProduct = async (id: number, updates: Partial<Product>) => {
+    const updated = await fetchJson<Product>(`/products/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+    setProducts(prev => prev.map(p => (p.id === id ? updated : p)));
   };
 
-  const deleteProduct = (id: number) => {
-    setProducts(products.filter(p => p.id !== id));
+  const deleteProduct = async (id: number) => {
+    await fetchJson<void>(`/products/${id}`, { method: 'DELETE' });
+    setProducts(prev => prev.filter(p => p.id !== id));
   };
 
   return (

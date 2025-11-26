@@ -30,10 +30,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 export function Admin() {
   const navigate = useNavigate();
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
-  const { users } = useUser();
+  const { currentUser } = useUser();
   const { orders, updateOrderStatus } = useOrders();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const isStandalone = (import.meta as any).env?.VITE_STANDALONE_ADMIN === 'true';
+  const shopUrl = (import.meta as any).env?.VITE_SHOP_URL as string | undefined;
+
+  const handleBackToShop = () => {
+    if (isStandalone) {
+      if (shopUrl) {
+        window.location.href = shopUrl;
+      } else {
+        // default to root of the main site on same host but port 3000
+        const url = `${window.location.protocol}//${window.location.hostname}:3000/`;
+        window.location.href = url;
+      }
+    } else {
+      navigate('/home');
+    }
+  };
   
   const [editForm, setEditForm] = useState({
     name: '',
@@ -70,17 +86,21 @@ export function Admin() {
     }
   };
 
-  const handleSave = (productId: number) => {
-    updateProduct(productId, {
-      name: editForm.name,
-      price: parseFloat(editForm.price),
-      seller: editForm.seller,
-      category: editForm.category,
-      rating: parseFloat(editForm.rating),
-      image: editForm.image,
-    });
-    setEditingId(null);
-    toast.success('Product updated successfully!');
+  const handleSave = async (productId: number) => {
+    try {
+      await updateProduct(productId, {
+        name: editForm.name,
+        price: parseFloat(editForm.price),
+        seller: editForm.seller,
+        category: editForm.category,
+        rating: parseFloat(editForm.rating),
+        image: editForm.image,
+      });
+      setEditingId(null);
+      toast.success('Product updated successfully!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update product');
+    }
   };
 
   const handleCancel = () => {
@@ -95,43 +115,54 @@ export function Admin() {
     });
   };
 
-  const handleDelete = (productId: number) => {
+  const handleDelete = async (productId: number) => {
     if (confirm('Are you sure you want to delete this product?')) {
-      deleteProduct(productId);
-      toast.success('Product deleted successfully!');
+      try {
+        await deleteProduct(productId);
+        toast.success('Product deleted successfully!');
+      } catch (e: any) {
+        toast.error(e?.message || 'Failed to delete product');
+      }
     }
   };
 
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
     if (!newProductForm.name || !newProductForm.price || !newProductForm.seller || !newProductForm.image) {
       toast.error('Please fill in all required fields');
       return;
     }
+    try {
+      await addProduct({
+        name: newProductForm.name,
+        price: parseFloat(newProductForm.price),
+        seller: newProductForm.seller,
+        category: newProductForm.category,
+        rating: parseFloat(newProductForm.rating),
+        image: newProductForm.image,
+      });
 
-    addProduct({
-      name: newProductForm.name,
-      price: parseFloat(newProductForm.price),
-      seller: newProductForm.seller,
-      category: newProductForm.category,
-      rating: parseFloat(newProductForm.rating),
-      image: newProductForm.image,
-    });
-
-    setNewProductForm({
-      name: '',
-      price: '',
-      seller: '',
-      category: 'Tropical',
-      rating: '4.5',
-      image: '',
-    });
-    setIsAddDialogOpen(false);
-    toast.success('Product added successfully!');
+      setNewProductForm({
+        name: '',
+        price: '',
+        seller: '',
+        category: 'Tropical',
+        rating: '4.5',
+        image: '',
+      });
+      setIsAddDialogOpen(false);
+      toast.success('Product added successfully!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to add product');
+    }
   };
 
-  const handleOrderStatusChange = (orderId: number, status: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled') => {
-    updateOrderStatus(orderId, status);
-    toast.success('Order status updated!');
+  const handleOrderStatusChange = async (orderId: number, status: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled') => {
+    const ok = await updateOrderStatus(orderId, status);
+    if (ok) {
+      toast.success('Order status updated!');
+    } else {
+      toast.error('Failed to update status');
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -168,7 +199,7 @@ export function Admin() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/home')}
+            onClick={handleBackToShop}
             className="text-white hover:bg-white/20 mb-4"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
@@ -310,7 +341,7 @@ export function Admin() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Total Users</p>
-                <h3>{users.length}</h3>
+                <h3>{currentUser ? 1 : 0}</h3>
               </div>
             </div>
           </Card>
@@ -341,7 +372,6 @@ export function Admin() {
         <Tabs defaultValue="products" className="space-y-4">
           <TabsList>
             <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
 
@@ -505,31 +535,7 @@ export function Admin() {
             ))}
           </TabsContent>
 
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-4">
-            <div className="mb-4">
-              <h2 className="mb-2">Registered Users ({users.length})</h2>
-              <p className="text-gray-600">
-                View all registered user accounts
-              </p>
-            </div>
-            {users.map((user) => (
-              <Card key={user.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="mb-1">{user.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{user.email}</p>
-                    <p className="text-xs text-gray-500">
-                      Joined: {formatDate(user.createdAt)}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                    User ID: {user.id}
-                  </Badge>
-                </div>
-              </Card>
-            ))}
-          </TabsContent>
+          {/* Users tab temporarily disabled until user listing API is added */}
 
           {/* Orders Tab */}
           <TabsContent value="orders" className="space-y-4">

@@ -59,7 +59,14 @@
           "vite": "6.3.5"
       },
       "scripts": {
-          "dev": "vite",
-          "build": "vite build"
+          "dev": "vite --config vite.config.ts",
+          "dev:web": "vite --config vite.config.ts",
+          "dev:admin": "vite --config vite.admin.config.ts --mode admin",
+          "build": "vite build",
+          "build:admin": "vite build --config vite.admin.config.ts --mode admin",
+          "server:install": "npm install --prefix server",
+          "server:dev": "npm run dev --prefix server",
+          "server:build": "npm run build --prefix server",
+          "server:start": "npm start --prefix server"
       }
   }

@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { fetchJson } from '../lib/api';
+import { useUser } from './UserContext';
 
 export interface OrderItem {
   id: number;
@@ -23,72 +25,71 @@ export interface Order {
 }
 
 interface OrderContextType {
-  orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'trackingNumber'>) => string;
-  updateOrderStatus: (orderId: number, status: Order['status']) => void;
-  getUserOrders: (userId: number) => Order[];
+  orders: Order[]; // Admin: all orders; Regular user: own orders
+  placeOrder: (deliveryAddress: string, paymentMethod: string) => Promise<Order | null>;
+  updateOrderStatus: (orderId: number, status: Order['status']) => Promise<boolean>;
+  refreshOrders: () => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 // Load orders from localStorage
-const loadOrders = (): Order[] => {
-  try {
-    const storedOrders = localStorage.getItem('docplant_orders');
-    if (storedOrders) {
-      return JSON.parse(storedOrders);
-    }
-  } catch (error) {
-    console.error('Error loading orders from localStorage:', error);
-  }
-  return [];
-};
-
 export function OrderProvider({ children }: { children: ReactNode }) {
-  const [orders, setOrders] = useState<Order[]>(loadOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const { currentUser } = useUser();
 
-  // Save orders to localStorage whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem('docplant_orders', JSON.stringify(orders));
-    } catch (error) {
-      console.error('Error saving orders to localStorage:', error);
+  const refreshOrders = async () => {
+    if (!currentUser) {
+      setOrders([]);
+      return;
     }
-  }, [orders]);
-
-  const generateTrackingNumber = (): string => {
-    const prefix = 'DP';
-    const timestamp = Date.now().toString().slice(-8);
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    return `${prefix}${timestamp}${random}`;
+    try {
+      if (currentUser.email === 'admin@docplant.com') {
+        const data = await fetchJson<Order[]>('/orders');
+        setOrders(data);
+      } else {
+        const data = await fetchJson<Order[]>('/orders/my');
+        setOrders(data);
+      }
+    } catch {
+      setOrders([]);
+    }
   };
 
-  const addOrder = (order: Omit<Order, 'id' | 'createdAt' | 'trackingNumber'>): string => {
-    const trackingNumber = generateTrackingNumber();
-    const newOrder: Order = {
-      ...order,
-      id: Math.max(...orders.map(o => o.id), 0) + 1,
-      createdAt: new Date().toISOString(),
-      trackingNumber,
-    };
-    setOrders([...orders, newOrder]);
-    return trackingNumber;
+  useEffect(() => {
+    refreshOrders();
+  }, [currentUser]);
+
+  const placeOrder = async (deliveryAddress: string, paymentMethod: string): Promise<Order | null> => {
+    if (!currentUser) return null;
+    try {
+      const order = await fetchJson<Order>('/orders', {
+        method: 'POST',
+        body: JSON.stringify({ deliveryAddress, paymentMethod }),
+      });
+      await refreshOrders();
+      return order;
+    } catch (e) {
+      return null;
+    }
   };
 
-  const updateOrderStatus = (orderId: number, status: Order['status']) => {
-    setOrders(orders.map(o => 
-      o.id === orderId ? { ...o, status } : o
-    ));
-  };
-
-  const getUserOrders = (userId: number): Order[] => {
-    return orders.filter(o => o.userId === userId).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+  const updateOrderStatus = async (orderId: number, status: Order['status']): Promise<boolean> => {
+    if (!currentUser || currentUser.email !== 'admin@docplant.com') return false;
+    try {
+      await fetchJson(`/orders/${orderId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+      await refreshOrders();
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   return (
-    <OrderContext.Provider value={{ orders, addOrder, updateOrderStatus, getUserOrders }}>
+    <OrderContext.Provider value={{ orders, placeOrder, updateOrderStatus, refreshOrders }}>
       {children}
     </OrderContext.Provider>
   );

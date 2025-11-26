@@ -12,7 +12,7 @@ import { GlassCard } from '../GlassCard';
 
 export function SignUp() {
   const navigate = useNavigate();
-  const { signup, login } = useUser();
+  const { signup } = useUser();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,30 +21,24 @@ export function SignUp() {
   });
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-
-    const success = signup(formData.email, formData.password, formData.name);
-    
+    const success = await signup(formData.email, formData.password, formData.name);
     if (success) {
       toast.success('Welcome to Doc Plant! 🌱');
       navigate('/home');
     } else {
-      toast.error('Email already exists');
+      toast.error('Registration failed');
     }
   };
 
-  const handleSocialLogin = () => {
-    const success = login('admin@docplant.com', 'admin123');
-    if (success) {
-      toast.success('Welcome to Doc Plant! 🌱');
-      navigate('/home');
-    }
+  const handleSocialLogin = async () => {
+    // Placeholder: social login not implemented
+    toast.error('Social login is not available');
   };
 
   return (

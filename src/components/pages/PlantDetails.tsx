@@ -168,16 +168,9 @@ export function PlantDetails() {
 
   const details = plantDetailsData[plant.id] || getDefaultPlantDetails(plant.category);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: plant.id,
-        name: plant.name,
-        seller: plant.seller,
-        price: plant.price,
-        image: plant.image,
-        category: plant.category,
-      });
+      await addToCart(plant.id);
     }
     toast.success(`${quantity} ${plant.name}${quantity > 1 ? 's' : ''} added to cart! 🌿`);
   };

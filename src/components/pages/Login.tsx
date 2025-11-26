@@ -19,11 +19,9 @@ export function Login() {
   });
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const success = login(formData.email, formData.password);
-    
+    const success = await login(formData.email, formData.password);
     if (success) {
       toast.success('Welcome back! 🌿');
       navigate('/home');
@@ -32,12 +30,9 @@ export function Login() {
     }
   };
 
-  const handleSocialLogin = () => {
-    const success = login('admin@docplant.com', 'admin123');
-    if (success) {
-      toast.success('Welcome back! 🌿');
-      navigate('/home');
-    }
+  const handleSocialLogin = async () => {
+    // Placeholder: social login not implemented
+    toast.error('Social login is not available');
   };
 
   return (

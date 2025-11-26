@@ -11,10 +11,9 @@ import { motion } from 'framer-motion';
 
 export function OrderTracking() {
   const navigate = useNavigate();
-  const { getUserOrders } = useOrders();
+  const { orders } = useOrders();
   const { currentUser } = useUser();
-
-  const userOrders = currentUser ? getUserOrders(currentUser.id) : [];
+  const userOrders = currentUser ? orders : [];
 
   const getStatusColor = (status: string) => {
     switch (status) {

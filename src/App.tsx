@@ -16,7 +16,6 @@ import { Checkout } from './components/pages/Checkout';
 import { GrowthTracker } from './components/pages/GrowthTracker';
 import { Reminders } from './components/pages/Reminders';
 import { CommunityForum } from './components/pages/CommunityForum';
-import { Admin } from './components/pages/Admin';
 import { OrderTracking } from './components/pages/OrderTracking';
 import { PlantDetails } from './components/pages/PlantDetails';
 
@@ -43,7 +42,6 @@ export default function App() {
                   <Route path="/reminders" element={<Reminders />} />
                   <Route path="/community" element={<CommunityForum />} />
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/admin" element={<Admin />} />
                   <Route path="/plant/:id" element={<PlantDetails />} />
                   <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>

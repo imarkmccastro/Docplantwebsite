@@ -17,7 +17,7 @@ import { motion } from 'framer-motion';
 export function Checkout() {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
-  const { addOrder } = useOrders();
+  const { placeOrder } = useOrders();
   const { currentUser } = useUser();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -58,25 +58,30 @@ export function Checkout() {
     }
 
     setIsProcessing(true);
-    
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const trackingNumber = addOrder({
-      userId: currentUser.id,
-      userEmail: currentUser.email,
-      userName: currentUser.name,
-      items: cartItems,
-      total,
-      status: 'Processing',
-      deliveryAddress: `${shippingInfo.address}, ${shippingInfo.city} ${shippingInfo.zipCode}`,
-      paymentMethod: `Card ending in ${paymentInfo.cardNumber.slice(-4)}`,
-    });
+    try {
+      // Optional UX delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    toast.success(`Order placed successfully! 🌿 Tracking: ${trackingNumber}`);
-    clearCart();
-    setIsProcessing(false);
-    navigate('/orders');
+      const order = await placeOrder(
+        `${shippingInfo.address}, ${shippingInfo.city} ${shippingInfo.zipCode}`,
+        `Card ending in ${paymentInfo.cardNumber.slice(-4)}`
+      );
+
+      if (!order) {
+        toast.error('Failed to place order. Please try again.');
+        setIsProcessing(false);
+        return;
+      }
+
+      toast.success(`Order placed! 🌿 Tracking: ${order.trackingNumber}`);
+      await clearCart();
+      setIsProcessing(false);
+      navigate('/orders');
+    } catch (e: any) {
+      toast.error('Unexpected error while placing order.');
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -143,7 +148,7 @@ export function Checkout() {
                         <div key={item.id} className="flex gap-4 pb-4 border-b border-white/40 last:border-b-0">
                           <div 
                             className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 border-2 border-white/60 cursor-pointer hover:border-emerald-300 transition-all"
-                            onClick={() => navigate(`/plant/${item.id}`)}
+                            onClick={() => navigate(`/plant/${item.productId}`)}
                           >
                             <ImageWithFallback
                               src={item.image}
@@ -155,7 +160,7 @@ export function Checkout() {
                           <div className="flex-1 min-w-0">
                             <h3 
                               className="mb-1 text-gray-800 cursor-pointer hover:text-emerald-600 transition-colors"
-                              onClick={() => navigate(`/plant/${item.id}`)}
+                              onClick={() => navigate(`/plant/${item.productId}`)}
                             >
                               {item.name}
                             </h3>
@@ -164,14 +169,14 @@ export function Checkout() {
                             <div className="flex items-center gap-3">
                               <div className="flex items-center gap-2 border-2 border-white/60 rounded-xl backdrop-blur-sm bg-white/50">
                                 <button
-                                  onClick={() => updateQuantity(item.id, -1)}
+                                  onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                                   className="px-3 py-1 hover:bg-emerald-50 rounded-l-xl transition-colors"
                                 >
                                   -
                                 </button>
                                 <span className="px-2 text-gray-700">{item.quantity}</span>
                                 <button
-                                  onClick={() => updateQuantity(item.id, 1)}
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                   className="px-3 py-1 hover:bg-emerald-50 rounded-r-xl transition-colors"
                                 >
                                   +
