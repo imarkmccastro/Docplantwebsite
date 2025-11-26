@@ -4,7 +4,8 @@
 
   ## Running the code
 
-  Run cd "e:\Source Codes\Docplantwebsite\server"; npm run dev 
+  Run 
+  ' cd "Storage Path:\ Docplantwebsite\server"; npm run dev '
   to connect to api server
 
   Run `npm i` to install the dependencies.
