@@ -30,6 +30,7 @@ export function ForgotPassword() {
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
       <EcoBackground />
 
+
       {/* Main Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
