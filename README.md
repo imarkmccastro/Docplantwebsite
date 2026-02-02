@@ -4,14 +4,12 @@
 
   ## Running the code
 
-  Run 
-  ' cd "Storage Path:\Docplantwebsite\server"; npm run dev '
-  to connect to api server
+  Run `pnpm -C server dev` to connect to api server.
 
-  Run `npm i` to install the dependencies.
+  Run `pnpm install` to install the dependencies.
 
-  Run `npm run dev:web` to start the development server.
-  Run `npm run dev:admin` to start the development server (admin).
+  Run `pnpm dev:web` to start the development server.
+  Run `pnpm dev:admin` to start the development server (admin).
   
   ### Importing Database Guide
 

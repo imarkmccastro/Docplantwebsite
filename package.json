@@ -3,6 +3,7 @@
       "name": "Doc Plant Website",
       "version": "0.1.0",
       "private": true,
+    "packageManager": "pnpm@9.15.1",
       "dependencies": {
           "@radix-ui/react-accordion": "^1.2.3",
           "@radix-ui/react-alert-dialog": "^1.1.6",
@@ -64,9 +65,9 @@
           "dev:admin": "vite --config vite.admin.config.ts --mode admin",
           "build": "vite build",
           "build:admin": "vite build --config vite.admin.config.ts --mode admin",
-          "server:install": "npm install --prefix server",
-          "server:dev": "npm run dev --prefix server",
-          "server:build": "npm run build --prefix server",
-          "server:start": "npm start --prefix server"
+        "server:install": "pnpm -C server install",
+        "server:dev": "pnpm -C server dev",
+        "server:build": "pnpm -C server build",
+        "server:start": "pnpm -C server start"
       }
   }

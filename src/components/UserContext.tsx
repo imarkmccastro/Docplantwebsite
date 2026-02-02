@@ -13,6 +13,7 @@ interface UserContextType {
   token: string | null;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
+  localLogin: (email?: string, name?: string) => void;
   logout: () => void;
 }
 
@@ -42,6 +43,17 @@ const loadToken = (): string | null => {
 export function UserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(loadCurrentUser);
   const [token, setToken] = useState<string | null>(loadToken);
+
+  const createLocalUser = (email?: string, name?: string): User => {
+    const safeEmail = email?.trim() || 'guest@local';
+    const fallbackName = safeEmail.includes('@') ? safeEmail.split('@')[0] : safeEmail;
+    return {
+      id: Date.now(),
+      email: safeEmail,
+      name: name?.trim() || fallbackName || 'Guest',
+      createdAt: new Date().toISOString(),
+    };
+  };
 
   // Save current user to localStorage whenever it changes
   useEffect(() => {
@@ -99,13 +111,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const localLogin = (email?: string, name?: string) => {
+    const user = createLocalUser(email, name);
+    setCurrentUser(user);
+    setToken('local');
+  };
+
   const logout = () => {
     setCurrentUser(null);
     setToken(null);
   };
 
   return (
-    <UserContext.Provider value={{ currentUser, token, login, signup, logout }}>
+    <UserContext.Provider value={{ currentUser, token, login, signup, localLogin, logout }}>
       {children}
     </UserContext.Provider>
   );

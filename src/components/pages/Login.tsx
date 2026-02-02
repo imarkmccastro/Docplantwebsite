@@ -12,7 +12,7 @@ import { GlassCard } from '../GlassCard';
 
 export function Login() {
   const navigate = useNavigate();
-  const { login } = useUser();
+  const { login, localLogin } = useUser();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -33,6 +33,12 @@ export function Login() {
   const handleSocialLogin = async () => {
     // Placeholder: social login not implemented
     toast.error('Social login is not available');
+  };
+
+  const handleLocalLogin = () => {
+    localLogin(formData.email);
+    toast.success('Continuing locally (no database)');
+    navigate('/home');
   };
 
   return (
@@ -177,6 +183,20 @@ export function Login() {
                   className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white border-0 rounded-2xl h-12 shadow-lg shadow-emerald-200/50 hover:shadow-xl hover:shadow-emerald-300/50 transition-all duration-300"
                 >
                   <span className="relative z-10">Log In</span>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleLocalLogin}
+                  className="w-full rounded-2xl h-12 border-2 border-emerald-200 text-emerald-700 bg-white/70 hover:bg-emerald-50"
+                >
+                  Continue Locally (No Database)
                 </Button>
               </motion.div>
             </form>
